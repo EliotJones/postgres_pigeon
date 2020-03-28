@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1022
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostgresPigeon", "PostgresPigeon\PostgresPigeon.csproj", "{B49FDC37-3948-4933-BB1B-3DB19A1871AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgresPigeon.ConsoleHarness", "PostgresPigeon.ConsoleHarness\PostgresPigeon.ConsoleHarness.csproj", "{371AD6D3-9B43-44B1-AF42-1D61A290023E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B49FDC37-3948-4933-BB1B-3DB19A1871AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B49FDC37-3948-4933-BB1B-3DB19A1871AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B49FDC37-3948-4933-BB1B-3DB19A1871AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B49FDC37-3948-4933-BB1B-3DB19A1871AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{371AD6D3-9B43-44B1-AF42-1D61A290023E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{371AD6D3-9B43-44B1-AF42-1D61A290023E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{371AD6D3-9B43-44B1-AF42-1D61A290023E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{371AD6D3-9B43-44B1-AF42-1D61A290023E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8DDE4FD7-5A30-40B3-88F5-3495153FDA42}
+	EndGlobalSection
+EndGlobal
