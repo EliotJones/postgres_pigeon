@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Data.Common;
     using System.Diagnostics;
+    using System.Linq;
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
@@ -25,6 +26,7 @@
         private readonly SocketAsyncEventArgs eOut = new SocketAsyncEventArgs();
         private WriteBuffer writeBuffer;
         private SocketWrapper writeSocket;
+        private TypeInformationLoader typeInformationLoader;
 
         public Connector(string connectionString)
         {
@@ -79,6 +81,9 @@
                     messages.Add(message);
                     message = await messageReader.ReadMessage(stream, cancellationToken);
                 }
+
+                typeInformationLoader = new TypeInformationLoader(stream, messageReader, writeBuffer, writeSocket, streamEncoding);
+                await typeInformationLoader.GetTypeNameForOid(16);
             }
             catch (Exception ex)
             {
@@ -99,11 +104,52 @@
                 throw new InvalidOperationException("Not connected! :( .");
             }
 
-            await new QueryMessage(query).Send(writeSocket, writeBuffer);
+            try
+            {
+                await semaphore.WaitAsync();
 
-            var message = await messageReader.ReadMessage(stream, CancellationToken.None);
+                await new QueryMessage(query).Send(writeSocket, writeBuffer);
 
-            return string.Empty;
+                var types = new List<string>();
+                var rows = new List<List<string>>();
+
+                object message;
+                do
+                {
+                    message = await messageReader.ReadMessage(stream, CancellationToken.None);
+
+                    if (message is RowDescription rd)
+                    {
+                        foreach (var rdValue in rd.Values)
+                        {
+                            var type = await typeInformationLoader.GetTypeNameForOid(rdValue.FieldDataTypeObjectId);
+                            types.Add(type);
+                        }
+                    }
+                    else if (message is DataRow dr)
+                    {
+                        var row = new List<string>();
+
+                        foreach (var value in dr.Values)
+                        {
+                            if (value == null)
+                            {
+                                row.Add("null");
+                                continue;
+                            }
+                            row.Add(streamEncoding.GetString(value));
+                        }
+
+                        rows.Add(row);
+                    }
+                } while (message != null && !(message is CommandComplete));
+
+                return string.Join("\r\n", rows.Select(x => string.Join(", ", x)));
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         public void Dispose()

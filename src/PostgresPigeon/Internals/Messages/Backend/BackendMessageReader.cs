@@ -36,6 +36,13 @@
 
             switch (type)
             {
+                case 'C':
+                {
+                    var str = encoding.GetString(buffer, 0, length - 1);
+                    return new CommandComplete(str);
+                }
+                case 'D':
+                    return GetDataRow(length);
                 case 'R':
                     return GetAuthMessage(length);
                 case 'S':
@@ -83,7 +90,7 @@
 
             var offset = 2;
 
-            var rowNames = new List<string>();
+            var columns = new List<RowDescription.Value>();
 
             for (var i = 0; i < numberOfFields; i++)
             {
@@ -118,10 +125,42 @@
                 var formatCode = ReadShort(offset);
                 offset += 2;
 
-                rowNames.Add(name);
+                columns.Add(new RowDescription.Value(name, tableObjectId, columnAttributeNumber,
+                    fieldDataTypeObjectId,
+                    dataTypeSize,
+                    typeModifier, 
+                    formatCode));
             }
 
-            return null;
+            return new RowDescription(columns);
+        }
+
+        private object GetDataRow(int length)
+        {
+            var offset = 0;
+            var numberOfColumns = ReadShort(0);
+            offset += 2;
+
+            var values = new byte[numberOfColumns][];
+
+            for (var i = 0; i < numberOfColumns; i++)
+            {
+                var valueLength = ReadInt(offset);
+                offset += 4;
+                if (valueLength == -1)
+                {
+                    values[i] = null;
+                }
+                else
+                {
+                    var val = new byte[valueLength];
+                    Array.Copy(buffer, offset, val, 0, valueLength);
+                    values[i] = val;
+                    offset += valueLength;
+                }
+            }
+
+            return new DataRow(values);
         }
 
         private BackendAuthMessage GetAuthMessage(int length)
